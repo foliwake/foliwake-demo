@@ -1,17 +1,37 @@
-# foliwake-demo
+# Foliwake demo: Umami Kitchen
 
-The frontend of a Foliwake site: blocks, styles and a few local pages to work with. Created with `create-foliwake` 0.8.0 (template `minimal`).
+The frontend of the public Foliwake demo site. Its articles are the sample content of Drupal's
+Umami demo profile (English and Spanish), read by Foliwake's Drupal source; this repository holds
+only the design: page templates, blocks and styles on HTML contract 2. Created with
+`create-foliwake` 0.8.0 (template `minimal`).
 
 ```text
-components/<name>/     one folder per block: <name>.json (its fields), <name>.css, optionally <name>.js and <name>.example.md
-scripts/components.js  the loader: loads each block's CSS and JS on the pages that use it
-styles/styles.css      styles of every page
-site.yaml              site settings for the engine (authoring dialect)
-content/               local Markdown pages to develop against (not published by this repository)
+templates/<name>/      page templates: home (the home page), article and article-list (Drupal pages)
+components/<name>/     blocks: latest (newest articles, block-kit) and features
+scripts/site.js        the header, footer and light/dark switch every template adds
+scripts/components.js  the block loader (from create-foliwake)
+styles/styles.css      styles of every page: colours, type, header and footer
+site.yaml              site settings for the engine
+content/               the home page (published from this repository with `foliwake preview`)
+dev-content/           local pages shaped like the Drupal pages, for `npm run dev:articles` (not published)
 tests/                 quick checks of the vendored scripts and workflows (node --test "tests/*.test.mjs")
-foliwake.config.json   local configuration for the Foliwake CLI (`foliwake dev`); unused without it
-.github/               checks, branch previews and production (inert until connected)
+foliwake.config.json   local configuration for the Foliwake CLI (`foliwake dev`): the code and the content
+.github/               checks, branch previews and production
 ```
+
+### How Drupal pages get their template
+
+Drupal cannot write front matter, so the site's Drupal source names the templates with path mapping
+rules (on the server, `foliwake site edit`):
+
+```json
+"mappings": [
+  { "match": "{lang}/list.md", "metadata": { "template": "article-list" } },
+  { "match": "{lang}/node-{nid}.md", "metadata": { "template": "article" } }
+]
+```
+
+The pages in `dev-content/` name the same templates in their front matter.
 
 There is no build step: the files in `components/`, `scripts/` and `styles/` are what the browser loads.
 
@@ -36,9 +56,9 @@ The Foliwake CLI is not public yet. Where you have it, it adds a local preview a
 foliwake dev --watch
 ```
 
-Open http://127.0.0.1:3000/. Edit a page in `content/`, a block or a stylesheet and save: the browser reloads. `dev` uses only local files; no server, store or account is needed. Every block and its examples are on http://127.0.0.1:3000/_dev/blocks: each example rendered with your CSS and JavaScript, its HTML and its problems. Authors see the same examples as a block catalog at `/_foliwake/blocks` on the preview.
+Open http://127.0.0.1:3000/ (`npm run dev`: the home page; `npm run dev:articles`: the sample article pages). Edit a page in `content/`, a block or a stylesheet and save: the browser reloads. `dev` uses only local files; no server, store or account is needed. Every block and its examples are on http://127.0.0.1:3000/_dev/blocks: each example rendered with your CSS and JavaScript, its HTML and its problems. Authors see the same examples as a block catalog at `/_foliwake/blocks` on the preview.
 
-`foliwake page check` checks every page and block example too. Run it in this folder: the CLI finds `foliwake.config.json` here by itself; after cloning the repository or changing the file, read it and run `foliwake config trust` once (it decides where credentials are sent).
+`foliwake page check` checks every page and block example too. In a folder linked to a site (`.foliwake/connection.json`) it checks the site's pages on the server; `foliwake page check --config foliwake.config.json [--content dev-content]` checks the local files.
 
 ### Add a block
 

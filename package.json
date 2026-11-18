@@ -7,6 +7,7 @@
     "check": "npx @foliwake/site-check",
     "test": "node --test \"tests/*.test.mjs\"",
     "dev": "foliwake dev --watch",
+    "dev:articles": "foliwake dev --watch --content dev-content",
     "check:pages": "foliwake page check"
   },
   "foliwake": {

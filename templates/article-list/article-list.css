@@ -1,0 +1,104 @@
+/* Article lists: a responsive grid of cards. */
+
+html[data-template="article-list"] main h1 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.list-intro {
+  color: var(--muted);
+  font-size: 1.15rem;
+  max-width: var(--measure);
+  margin-bottom: 2.5rem;
+}
+
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+}
+
+.card {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.card:hover,
+.card:focus-within {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.card__image {
+  margin: 0;
+  background: var(--surface-2);
+}
+
+.card__image img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.card__body {
+  padding: 1.1rem 1.25rem 1.4rem;
+}
+
+.card__title {
+  font-size: 1.3rem;
+  margin: 0 0 0.6rem;
+}
+
+.card__title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* The whole card follows the title's link. */
+.card__title a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.card__title a:hover {
+  color: var(--accent);
+}
+
+.card__summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card:hover,
+  .card:focus-within {
+    transform: none;
+  }
+}
+
+/* Without JavaScript: the plain sequence, images kept modest. */
+html[data-template="article-list"]:not(.has-cards) main h2 + p > img {
+  max-width: 28rem;
+  border-radius: var(--radius);
+}

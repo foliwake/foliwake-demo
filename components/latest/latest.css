@@ -1,0 +1,97 @@
+/* latest: a title and the three newest article cards of a list. */
+
+.latest [data-field="title"] {
+  margin: 0;
+}
+
+/* The list's path is for the script, not for readers. */
+.latest [data-field="list"] {
+  display: none;
+}
+
+.latest__status {
+  color: var(--muted);
+  margin: 1.5rem 0 0;
+}
+
+.latest__cards {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+}
+
+.latest__card {
+  position: relative;
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.latest__card:hover,
+.latest__card:focus-within {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.latest__image {
+  margin: 0;
+  background: var(--surface-2);
+}
+
+.latest__image img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.latest__body {
+  padding: 1rem 1.2rem 1.3rem;
+}
+
+.latest__body h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text);
+}
+
+.latest__body h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.latest__body h3 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.latest__body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .latest__card {
+    transition: none;
+  }
+
+  .latest__card:hover,
+  .latest__card:focus-within {
+    transform: none;
+  }
+}

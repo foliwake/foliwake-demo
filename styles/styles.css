@@ -1,106 +1,275 @@
-/* Site styles, linked by every page. Block styles live next to each block:
-   components/<name>/<name>.css (in @layer blocks, which comes after base).
+/* Site styles: every page. Templates (templates/<name>/<name>.css) and blocks
+   (components/<name>/<name>.css) add their own after this file. */
 
-   Fonts: the system font stack needs no files. To use your own font, put the
-   files in styles/fonts/ and declare them here with @font-face, pointing at
-   them with a relative URL such as ./fonts/site.woff2 (a code release accepts
-   only relative references to files inside the project; the engine scans even
-   comments, so do not leave example URLs to missing files here). */
+:root {
+  color-scheme: light;
+  --bg: #fbf8f3;
+  --surface: #ffffff;
+  --surface-2: #f3eee6;
+  --text: #1f1b16;
+  --muted: #6b6258;
+  --line: #e6dfd4;
+  --accent: #c2410c;
+  --accent-strong: #9a3412;
+  --accent-soft: #fde8d7;
+  --shadow: 0 1px 2px rgb(31 27 22 / 6%), 0 8px 24px rgb(31 27 22 / 8%);
+  --radius: 14px;
+  --measure: 42rem;
+  --wide: 72rem;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+}
 
-@layer base, blocks;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #15120f;
+  --surface: #1e1a16;
+  --surface-2: #27221c;
+  --text: #f2ece4;
+  --muted: #b3a89b;
+  --line: #3a332b;
+  --accent: #fb923c;
+  --accent-strong: #fdba74;
+  --accent-soft: #3b2414;
+  --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 35%);
+}
 
-@layer base {
-  :root {
-    --color-text: #18181b;
-    --color-muted: #52525b;
-    --color-page: #ffffff;
-    --color-surface: #f4f4f5;
-    --color-border: #d4d4d8;
-    --color-accent: #1d4ed8;
-    --radius: 0.75rem;
-    --space: 1rem;
-    color-scheme: light dark;
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #15120f;
+    --surface: #1e1a16;
+    --surface-2: #27221c;
+    --text: #f2ece4;
+    --muted: #b3a89b;
+    --line: #3a332b;
+    --accent: #fb923c;
+    --accent-strong: #fdba74;
+    --accent-soft: #3b2414;
+    --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 35%);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font: 1.0625rem/1.65 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--wide);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(2.1rem, 1.5rem + 2.6vw, 3.4rem);
+  margin: 0 0 1rem;
+}
+
+h2 {
+  font-size: clamp(1.45rem, 1.2rem + 1vw, 1.9rem);
+  margin: 2.5rem 0 0.75rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+  margin: 1.75rem 0 0.5rem;
+}
+
+p,
+ul,
+ol,
+blockquote {
+  margin: 0 0 1.1rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--accent-strong);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+blockquote {
+  border-left: 4px solid var(--accent);
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+code {
+  font-size: 0.9em;
+  background: var(--surface-2);
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+}
+
+/* Header and footer: added by scripts/site.js on every template. */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-header__inner {
+  max-width: var(--wide);
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  color: var(--text);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  white-space: nowrap;
+  margin-right: auto;
+}
+
+.site-brand:hover {
+  color: var(--text);
+}
+
+.site-brand__mark {
+  color: var(--accent);
+}
+
+.site-brand__tag {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.site-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.theme-toggle svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.site-footer__inner {
+  max-width: var(--wide);
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+@media (max-width: 40rem) {
+  .site-brand__tag {
+    display: none;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-text: #e4e4e7;
-      --color-muted: #a1a1aa;
-      --color-page: #18181b;
-      --color-surface: #27272a;
-      --color-border: #3f3f46;
-      --color-accent: #93b4ff;
-    }
-  }
-
-  *, *::before, *::after { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 1.0625rem;
-    line-height: 1.6;
-    color: var(--color-text);
-    background: var(--color-page);
-  }
-
-  main {
-    max-width: 68ch;
-    margin-inline: auto;
-    padding: 2rem 1rem 4rem;
-  }
-
-  h1, h2, h3 { line-height: 1.25; }
-  img { max-width: 100%; height: auto; }
-
-  /* The Foliwake logo of the welcome page (content/index.md): the image with the text "Foliwake" at
-     the very top of a page, small, above the title. Matched by its alt text, which the engine keeps on
-     every channel (the file name becomes a hash on preview and live). Other images are not affected.
-     The logo is dark on transparent: a white plate (invisible on the light page) keeps it readable in dark mode. */
-  main > [data-section]:first-child > p:first-child > img[alt="Foliwake"]:only-child {
-    display: block;
-    width: 13rem;
+  .site-nav a {
     padding: 0.4rem 0.5rem;
-    border-radius: var(--radius);
-    background: #ffffff;
-    margin-left: -0.5rem;
   }
-  a { color: var(--color-accent); }
-  code { font-size: 0.95em; }
+}
 
-  /* Markdown tables: <div data-table> scrolls sideways on narrow screens. */
-  [data-table] { overflow-x: auto; margin-block: 1.25rem; }
-  table { border-collapse: collapse; min-width: 100%; }
-  th, td {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--color-border);
-    text-align: start;
-    vertical-align: top;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
-  th { font-weight: 600; background: var(--color-surface); }
-  :is(th, td)[data-align="center"] { text-align: center; }
-  :is(th, td)[data-align="right"] { text-align: end; }
-
-  /* Sections of a page (`---` between them in Markdown). */
-  [data-section] + [data-section] {
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--color-border);
-  }
-
-  /* Every block: a card. A block's own CSS adds what is its own. */
-  [data-component] {
-    margin: 1.5rem 0;
-    padding: var(--space) calc(var(--space) * 1.25);
-    border-radius: var(--radius);
-    background: var(--color-surface);
-
-    & > :first-child { margin-top: 0; }
-    & > :last-child { margin-bottom: 0; }
-  }
-
-  /* Do not show a block while the loader (scripts/components.js) is still
-     loading its CSS and JavaScript. Only the loader sets this status, so
-     without JavaScript nothing is hidden and the HTML stays readable. */
-  [data-component][data-component-status="loading"] { visibility: hidden; }
 }

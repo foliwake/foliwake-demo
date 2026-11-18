@@ -1,32 +1,40 @@
 ---
 id: home
 path: /
-title: Home
-description: A Foliwake site created with create-foliwake.
+title: Umami Kitchen — a Foliwake demo
+description: Recipes and kitchen stories from the Drupal Umami demo, published as fast static pages with Foliwake.
+authoring: blocks-v3
+template: home
 ---
 
-![Foliwake](./images/foliwake-logo.png)
+# Cook something good tonight
 
-# Your Foliwake site is running
+Recipes, tips and kitchen stories from the Umami food magazine. Written in Drupal, reviewed in a preview and published by Foliwake as plain, fast HTML.
 
-Foliwake turns Markdown pages like this one into fast, plain HTML, and the blocks in `components/` give them their look and behaviour.
+- [Read the articles](/articles)
+- [Leer en español](/es/articles)
 
-## Try this now
+---
 
-1. **Edit this page.** Open `content/index.md`, change a sentence and save: the browser reloads.
-2. **See your blocks.** Open [the block catalog](/_dev/blocks): every block with its examples.
-3. **Make your own block.** With the Foliwake CLI, run `foliwake blocks new callout --js --example`, then look for it in the catalog.
+:::latest
 
-:::note
+## Fresh from the kitchen
 
-### This is a block
-
-The box around this text is the block `note`. Its fields are defined in `components/note/note.json` and its look in `components/note/note.css`.
+/articles
 
 :::
 
+[All articles](/articles)
+
 ---
 
-## When you're ready
+:::features
 
-Check the code with `npx @foliwake/site-check`, push the repository to GitHub and connect it to your site in the Foliwake admin: every branch gets a preview. `README.md` has the rest.
+## How this site is made
+
+- **Written in Drupal.** The articles are the Umami sample content of a Drupal site, in English and Spanish.
+- **Reviewed in a preview.** Foliwake reads them into a protected preview with this site's design.
+- **Published as HTML.** Selected pages go live as plain HTML pages, served from a cache.
+- **Designed in Git.** Templates, blocks and styles live in this repository and are released from `main`.
+
+:::

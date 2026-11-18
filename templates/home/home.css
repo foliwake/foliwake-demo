@@ -1,0 +1,75 @@
+/* The home page: full-width sections, each block brings its own look. */
+
+html[data-template="home"] main {
+  padding-top: 1.5rem;
+}
+
+html[data-template="home"] main > section + section {
+  margin-top: 3.5rem;
+}
+
+/* The first section (the page title and the hero block) is the opening panel. */
+html[data-template="home"] main > section:first-of-type {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2.5rem, 6vw, 5rem) clamp(1.25rem, 5vw, 4rem);
+  border-radius: calc(var(--radius) * 1.5);
+  background:
+    radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 45%),
+    radial-gradient(circle at 10% 110%, color-mix(in srgb, #65a30d 18%, transparent), transparent 50%),
+    var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+html[data-template="home"] main > section:first-of-type h1 {
+  max-width: 16ch;
+  margin: 0 0 1rem;
+  font-size: clamp(2.4rem, 1.6rem + 3.6vw, 4.4rem);
+}
+
+/* The links of the opening panel as buttons. */
+html[data-template="home"] main > section:first-of-type > ul {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+html[data-template="home"] main > section:first-of-type > p {
+  max-width: 38rem;
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+
+html[data-template="home"] main > section:first-of-type > ul a {
+  display: inline-block;
+  padding: 0.75rem 1.3rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+}
+
+html[data-template="home"] main > section:first-of-type > ul li:first-child a {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+/* "All articles" after the latest block. */
+html[data-template="home"] .latest + p {
+  margin: 1.25rem 0 0;
+  font-weight: 600;
+}
+
+html[data-template="home"] .latest + p a {
+  text-decoration: none;
+}
+
+html[data-template="home"] .latest + p a::after {
+  content: " →";
+}

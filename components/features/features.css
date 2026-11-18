@@ -1,0 +1,40 @@
+/* features: a title and a grid of short points; the bold start of an item is its heading. */
+
+.features [data-field="title"] {
+  margin-top: 0;
+}
+
+.features [data-field="items"] {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  counter-reset: feature;
+}
+
+.features [data-field="items"] > li {
+  counter-increment: feature;
+  padding: 1.25rem 1.25rem 1.4rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+}
+
+.features [data-field="items"] > li::before {
+  content: counter(feature, decimal-leading-zero);
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.features [data-field="items"] strong {
+  display: block;
+  color: var(--text);
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
