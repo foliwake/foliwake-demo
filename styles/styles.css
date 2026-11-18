@@ -263,8 +263,21 @@ code {
     display: none;
   }
 
+  .site-header__inner {
+    gap: 0.5rem;
+  }
+
+  .site-brand {
+    font-size: 1.1rem;
+  }
+
   .site-nav a {
-    padding: 0.4rem 0.5rem;
+    padding: 0.35rem 0.45rem;
+    font-size: 0.95rem;
+  }
+
+  .theme-toggle {
+    flex: none;
   }
 }
 
