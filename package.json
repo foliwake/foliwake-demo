@@ -12,5 +12,6 @@
   },
   "foliwake": {
     "cli": "0.8.0"
-  }
+  },
+  "license": "Apache-2.0"
 }
