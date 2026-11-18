@@ -1,0 +1,108 @@
+# Hosted branch previews: every push to a branch other than main asks the
+# Foliwake server to show exactly that commit as the branch preview
+# https://<branch>--<site>[--<org>].<branch host domain>/ (`foliwake branch
+# update`): the branch's code over the site's saved preview content. Deleting
+# the branch stops its preview (`foliwake branch delete`). Live and the site's
+# preview are never touched; main is handled by production.yml. This site has
+# no build step: the server takes the code (components/, scripts/, styles/,
+# site.yaml) from the pushed commit itself.
+#
+# INERT until enabled: every job is skipped unless the repository variable
+# BRANCH_PREVIEWS_ENABLED is `true` and FOLIWAKE_SITE_ID is set. How to enable
+# it: README.md, "Connect to Foliwake".
+#
+# Server and key: the repository variable FOLIWAKE_SERVER and the secret
+# FOLIWAKE_TOKEN of the environment `branch-previews` (a CI key of this site,
+# `foliwake account keys create --site <site>`; it cannot publish pages or roll
+# back). The CLI is the open npm package @foliwake/cli, run with npx at the
+# exact version pinned in package.json `foliwake.cli`, outside the checkout so
+# only FOLIWAKE_SERVER picks the server. Pushes of forks never run here; pull
+# requests are not a trigger.
+#
+# Ordering: cancelling an older run is only an optimisation. The server checks
+# the run sequence (github.run_id), so a delayed older run never replaces a
+# newer one.
+name: Branch preview
+on:
+  push:
+    branches-ignore: [main]
+  delete:
+permissions:
+  contents: read
+concurrency:
+  group: branch-preview-${{ github.event_name == 'delete' && github.event.ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  preview:
+    if: >-
+      vars.BRANCH_PREVIEWS_ENABLED == 'true' &&
+      vars.FOLIWAKE_SITE_ID != '' &&
+      !github.event.repository.fork &&
+      github.event_name == 'push' && !github.event.deleted && github.ref_type == 'branch' &&
+      github.ref_name != 'main'
+    environment: branch-previews
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          sparse-checkout: package.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '^22.22.0'
+      - name: The Foliwake CLI pinned in package.json foliwake.cli
+        id: cli
+        run: |
+          version=$(node -p "require('./package.json').foliwake?.cli")
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "package.json foliwake.cli must be an exact version of @foliwake/cli, not '$version'"; exit 1; }
+          echo "package=@foliwake/cli@$version" >> "$GITHUB_OUTPUT"
+      - name: Update the branch preview on the Foliwake server
+        working-directory: ${{ runner.temp }}
+        env:
+          FOLIWAKE_SERVER: ${{ vars.FOLIWAKE_SERVER }}
+          FOLIWAKE_TOKEN: ${{ secrets.FOLIWAKE_TOKEN }}
+          FOLIWAKE_CLI: ${{ steps.cli.outputs.package }}
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+          SITE: ${{ vars.FOLIWAKE_SITE_ID }}
+        run: |
+          npx --yes "$FOLIWAKE_CLI" branch update "$BRANCH" --site "$SITE" --rev "$SHA" --sequence "$RUN_ID" --json
+  delete:
+    if: >-
+      vars.BRANCH_PREVIEWS_ENABLED == 'true' &&
+      vars.FOLIWAKE_SITE_ID != '' &&
+      !github.event.repository.fork &&
+      github.event_name == 'delete' && github.event.ref_type == 'branch' &&
+      github.event.ref != 'main'
+    environment: branch-previews
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          sparse-checkout: package.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '^22.22.0'
+      - name: The Foliwake CLI pinned in package.json foliwake.cli
+        id: cli
+        run: |
+          version=$(node -p "require('./package.json').foliwake?.cli")
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "package.json foliwake.cli must be an exact version of @foliwake/cli, not '$version'"; exit 1; }
+          echo "package=@foliwake/cli@$version" >> "$GITHUB_OUTPUT"
+      - name: Stop the branch preview on the Foliwake server
+        working-directory: ${{ runner.temp }}
+        env:
+          FOLIWAKE_SERVER: ${{ vars.FOLIWAKE_SERVER }}
+          FOLIWAKE_TOKEN: ${{ secrets.FOLIWAKE_TOKEN }}
+          FOLIWAKE_CLI: ${{ steps.cli.outputs.package }}
+          BRANCH: ${{ github.event.ref }}
+          RUN_ID: ${{ github.run_id }}
+          SITE: ${{ vars.FOLIWAKE_SITE_ID }}
+        run: |
+          npx --yes "$FOLIWAKE_CLI" branch delete "$BRANCH" --site "$SITE" --sequence "$RUN_ID" --json

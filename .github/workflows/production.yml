@@ -1,0 +1,82 @@
+# Frontend production: a push to main (normally a merged pull request) runs the
+# frontend checks and asks the Foliwake server to deploy exactly that commit
+# with `foliwake code deploy`: the server fetches the commit, makes a code
+# release from it and rebuilds every page against it in the site's preview.
+# With the site setting `codeRelease: auto` (the default) the server then
+# checks the rebuild (every page built, no page with problems, the code fits
+# the pages) and releases code and pages to live as one site release: merge to
+# main = release. If a check fails, or the site uses `codeRelease: manual`, the
+# code waits in the preview and you release it in the Foliwake admin
+# (Frontend > New code > Release); live is unchanged.
+# This site has no build step: the server takes the code from the main commit.
+#
+# Ordering: one run at a time (concurrency); the server refuses a deploy older
+# than one it already prepared (--sequence is the run id).
+#
+# INERT until enabled: the deploy job is skipped unless the repository variable
+# FRONTEND_PRODUCTION_DEPLOY_ENABLED is `true` (separate from
+# BRANCH_PREVIEWS_ENABLED) and FOLIWAKE_SITE_ID is set. How to enable it:
+# README.md, "Connect to Foliwake".
+#
+# Server and key: the repository variable FOLIWAKE_SERVER (the server's address)
+# and the secret FOLIWAKE_TOKEN (environment `production`, deployment branches:
+# main only): a CI key of this site from `foliwake account keys create --site
+# <site>`. It can deploy code and update branch previews; it cannot publish
+# pages or roll back (an admin does that in the Foliwake admin or with
+# `foliwake release rollback`). The CLI is the open npm package @foliwake/cli,
+# run with npx at the exact version pinned in package.json `foliwake.cli`,
+# outside the checkout so only FOLIWAKE_SERVER picks the server.
+name: Frontend production
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  # One production operation at a time; a running one is never cancelled.
+  group: frontend-production
+  cancel-in-progress: false
+jobs:
+  checks:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/frontend-checks.yml
+  deploy:
+    needs: checks
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.FRONTEND_PRODUCTION_DEPLOY_ENABLED == 'true' &&
+      vars.FOLIWAKE_SITE_ID != '' &&
+      !github.event.repository.fork
+    environment:
+      name: production
+      url: ${{ vars.FOLIWAKE_PRODUCTION_URL }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          sparse-checkout: package.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '^22.22.0'
+      - name: The Foliwake CLI pinned in package.json foliwake.cli
+        id: cli
+        run: |
+          version=$(node -p "require('./package.json').foliwake?.cli")
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "package.json foliwake.cli must be an exact version of @foliwake/cli, not '$version'"; exit 1; }
+          echo "package=@foliwake/cli@$version" >> "$GITHUB_OUTPUT"
+      - name: Deploy on the Foliwake server
+        working-directory: ${{ runner.temp }}
+        env:
+          FOLIWAKE_SERVER: ${{ vars.FOLIWAKE_SERVER }}
+          FOLIWAKE_TOKEN: ${{ secrets.FOLIWAKE_TOKEN }}
+          FOLIWAKE_CLI: ${{ steps.cli.outputs.package }}
+          SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+          SITE: ${{ vars.FOLIWAKE_SITE_ID }}
+        run: |
+          # 0: released (or prepared for a manual release); 3: released, cache refresh pending; 1: failed or held.
+          npx --yes "$FOLIWAKE_CLI" code deploy --site "$SITE" --rev "$SHA" --sequence "$RUN_ID" --json

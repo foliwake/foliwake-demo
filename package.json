@@ -1,0 +1,15 @@
+{
+  "name": "foliwake-demo",
+  "private": true,
+  "type": "module",
+  "description": "The frontend of a Foliwake site: blocks, styles and local sample pages.",
+  "scripts": {
+    "check": "npx @foliwake/site-check",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "dev": "foliwake dev --watch",
+    "check:pages": "foliwake page check"
+  },
+  "foliwake": {
+    "cli": "0.8.0"
+  }
+}

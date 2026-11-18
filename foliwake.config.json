@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "sites": [
+    {
+      "id": "demo",
+      "code": {
+        "root": ".",
+        "repository": null
+      },
+      "sources": [
+        {
+          "id": "content",
+          "plugin": "local-markdown",
+          "owns": [
+            "/"
+          ],
+          "settings": {
+            "root": "./content"
+          }
+        }
+      ],
+      "storage": {
+        "endpoint": "http://127.0.0.1:8333",
+        "bucket": "foliwake-demo"
+      },
+      "stateDir": "./.foliwake",
+      "liveHosts": [
+        "demo.localhost"
+      ],
+      "previewBaseHost": "preview.demo.localhost"
+    }
+  ]
+}
