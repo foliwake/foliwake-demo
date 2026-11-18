@@ -18,16 +18,7 @@
             "root": "./content"
           }
         }
-      ],
-      "storage": {
-        "endpoint": "http://127.0.0.1:8333",
-        "bucket": "foliwake-demo"
-      },
-      "stateDir": "./.foliwake",
-      "liveHosts": [
-        "demo.localhost"
-      ],
-      "previewBaseHost": "preview.demo.localhost"
+      ]
     }
   ]
 }
